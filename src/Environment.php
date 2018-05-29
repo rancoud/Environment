@@ -158,8 +158,8 @@ class Environment
                 $this->extractText($line);
             }
         }
-        
-        if(!empty($this->tempKey)){
+
+        if (!empty($this->tempKey)) {
             throw new EnvironmentException(sprintf('Key %s is missing " for multilines', $this->tempKey));
         }
     }
@@ -223,7 +223,7 @@ class Environment
         do {
             $lastPosition = mb_strpos($string, '"', $lastPosition);
             if ($lastPosition === false) {
-                $this->tempText .= rtrim($string, "\r") . $this->endline;
+                $this->tempText .= rtrim($string, "\r\n") . $this->endline;
                 $endLine = true;
             } elseif (mb_substr($string, $lastPosition - 1, 1) !== '\\') {
                 $this->tempText .= mb_substr($string, 0, $lastPosition);
