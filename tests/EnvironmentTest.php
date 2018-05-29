@@ -339,7 +339,10 @@ ok"
         $env = new Environment($folders, $fileVariable);
         $env->enableCache();
         $env->flushCache();
+        $env->setEndline(PHP_EOL);
+
         $env->load();
+
 
         static::assertEquals($this->fileMultilinesEnvContent, $env->getAll());
         static::assertSame($this->fileMultilinesEnvContent['RGPD'], $env->get('RGPD'));
