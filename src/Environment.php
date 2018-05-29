@@ -34,7 +34,7 @@ class Environment
     /** @var string */
     protected $tempKey;
     /** @var string */
-    protected $endline = "\r\n";
+    protected $endline = PHP_EOL;
 
     /**
      * Environment constructor.

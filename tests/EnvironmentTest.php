@@ -339,7 +339,6 @@ ok"
         $env = new Environment($folders, $fileVariable);
         $env->enableCache();
         $env->flushCache();
-        $env->setEndline(PHP_EOL);
 
         $env->load();
 
