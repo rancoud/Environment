@@ -44,7 +44,7 @@ class Environment
      */
     public function __construct($folders, string $filename = '.env')
     {
-        if (!is_array($folders)) {
+        if (!\is_array($folders)) {
             $folders = [$folders];
         }
 
@@ -84,7 +84,7 @@ class Environment
      */
     protected function findFileInFolders(int $currentIdx = 0): string
     {
-        if ($currentIdx >= count($this->folders)) {
+        if ($currentIdx >= \count($this->folders)) {
             throw new EnvironmentException('Env file not found');
         }
 
@@ -113,8 +113,8 @@ class Environment
     protected function createFilepath(string $folder, string $filename): string
     {
         $separator = '';
-        if (!in_array($folder[-1], ['/', '\\'], true)) {
-            $separator = DIRECTORY_SEPARATOR;
+        if (!\in_array($folder[-1], ['/', '\\'], true)) {
+            $separator = \DIRECTORY_SEPARATOR;
         }
 
         return $folder . $separator . $filename;
@@ -144,7 +144,7 @@ class Environment
             $this->detectIncludingEnvFile($line, $depth);
 
             $parts = mbsplit('=', $line, 2);
-            if (count($parts) === 2) {
+            if (\count($parts) === 2) {
                 if ($this->hasQuotes($parts[1])) {
                     $this->tempKey = $parts[0];
                     $this->extractText($parts[1]);
@@ -379,7 +379,7 @@ class Environment
             throw new EnvironmentException(sprintf('Variable %s doesn\'t exist', $name));
         }
 
-        return in_array($name, $values, true);
+        return \in_array($name, $values, true);
     }
 
     public function enableCache(): void
