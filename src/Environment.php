@@ -59,16 +59,16 @@ class Environment
     {
         $filepath = $this->findFileInFolders();
 
-        if ($this->cacheFile !== null && file_exists($this->cacheFile)) {
+        if ($this->cacheFile !== null && \file_exists($this->cacheFile)) {
             if ($this->hasToFlush) {
-                unlink($this->cacheFile);
-                $this->parse(file_get_contents($filepath));
+                \unlink($this->cacheFile);
+                $this->parse(\file_get_contents($filepath));
                 $this->saveInCache();
             } else {
                 $this->env = include $this->cacheFile;
             }
         } else {
-            $this->parse(file_get_contents($filepath));
+            $this->parse(\file_get_contents($filepath));
             $this->saveInCache();
         }
 
@@ -89,7 +89,7 @@ class Environment
         }
 
         $filepath = $this->createFilepath($this->folders[$currentIdx], $this->filename);
-        if (!file_exists($filepath)) {
+        if (!\file_exists($filepath)) {
             ++$currentIdx;
 
             return $this->findFileInFolders($currentIdx);
@@ -132,10 +132,10 @@ class Environment
             throw new EnvironmentException('Max recursion env file!');
         }
 
-        $lines = mb_split("\n", $content);
+        $lines = \mb_split("\n", $content);
         foreach ($lines as $line) {
             if ($this->inMultilines === false) {
-                $line = ltrim($line);
+                $line = \ltrim($line);
                 if ($this->isEmptyLine($line)) {
                     continue;
                 }
@@ -143,13 +143,13 @@ class Environment
 
             $this->detectIncludingEnvFile($line, $depth);
 
-            $parts = mbsplit('=', $line, 2);
+            $parts = \mbsplit('=', $line, 2);
             if (\count($parts) === 2) {
                 if ($this->hasQuotes($parts[1])) {
                     $this->tempKey = $parts[0];
                     $this->extractText($parts[1]);
                 } else {
-                    $parts[1] = rtrim($parts[1]);
+                    $parts[1] = \rtrim($parts[1]);
                     $this->inMultilines = false;
                     $parts[1] = $this->convertType($parts[1]);
                     $this->set($parts[0], $parts[1]);
@@ -160,7 +160,7 @@ class Environment
         }
 
         if (!empty($this->tempKey)) {
-            throw new EnvironmentException(sprintf('Key %s is missing " for multilines', $this->tempKey));
+            throw new EnvironmentException(\sprintf('Key %s is missing " for multilines', $this->tempKey));
         }
     }
 
@@ -171,7 +171,7 @@ class Environment
      */
     protected function isEmptyLine($line): bool
     {
-        $char = mb_substr($line, 0, 1);
+        $char = \mb_substr($line, 0, 1);
 
         return empty($line) || $char === '#' || $char === ';';
     }
@@ -184,14 +184,14 @@ class Environment
      */
     protected function detectIncludingEnvFile($line, $depth): void
     {
-        if (mb_substr($line, 0, 1) === '@') {
-            $line = rtrim($line);
-            $filename = mb_substr($line, 1, mb_strlen($line));
+        if (\mb_substr($line, 0, 1) === '@') {
+            $line = \rtrim($line);
+            $filename = \mb_substr($line, 1, \mb_strlen($line));
             $filepath = $this->createFilepath($this->currentFolder, $filename);
-            if (!file_exists($filepath)) {
-                throw new EnvironmentException(sprintf('Missing env file %s', $filename));
+            if (!\file_exists($filepath)) {
+                throw new EnvironmentException(\sprintf('Missing env file %s', $filename));
             }
-            $this->parse(file_get_contents($filepath), ++$depth);
+            $this->parse(\file_get_contents($filepath), ++$depth);
         }
     }
 
@@ -202,9 +202,9 @@ class Environment
      */
     protected function hasQuotes($line): bool
     {
-        $val = mb_strtolower($line);
+        $val = \mb_strtolower($line);
 
-        return mb_substr($val, 0, 1) === '"';
+        return \mb_substr($val, 0, 1) === '"';
     }
 
     /**
@@ -214,19 +214,19 @@ class Environment
     {
         $string = $line;
         if ($this->inMultilines === false) {
-            $string = mb_substr($line, 1);
+            $string = \mb_substr($line, 1);
         }
 
         $lastPosition = 0;
         $endLine = false;
         $endText = false;
         do {
-            $lastPosition = mb_strpos($string, '"', $lastPosition);
+            $lastPosition = \mb_strpos($string, '"', $lastPosition);
             if ($lastPosition === false) {
-                $this->tempText .= rtrim($string, "\r\n") . $this->endline;
+                $this->tempText .= \rtrim($string, "\r\n") . $this->endline;
                 $endLine = true;
-            } elseif (mb_substr($string, $lastPosition - 1, 1) !== '\\') {
-                $this->tempText .= mb_substr($string, 0, $lastPosition);
+            } elseif (\mb_substr($string, $lastPosition - 1, 1) !== '\\') {
+                $this->tempText .= \mb_substr($string, 0, $lastPosition);
                 $endText = true;
             } else {
                 ++$lastPosition;
@@ -234,7 +234,7 @@ class Environment
         } while ($endText !== true && $endLine !== true);
 
         if ($endText) {
-            $this->tempText = str_replace('\\"', '"', $this->tempText);
+            $this->tempText = \str_replace('\\"', '"', $this->tempText);
             $this->set($this->tempKey, $this->tempText);
             $this->tempKey = '';
             $this->tempText = '';
@@ -253,16 +253,16 @@ class Environment
      */
     protected function convertType($value)
     {
-        $val = mb_strtolower($value);
+        $val = \mb_strtolower($value);
         if ($val === 'true') {
             return true;
         } elseif ($val === 'false') {
             return false;
         } elseif ($val === 'null') {
             return null;
-        } elseif (mb_strpos($val, '.') !== false && is_numeric($val)) {
+        } elseif (\mb_strpos($val, '.') !== false && \is_numeric($val)) {
             return (float) $val;
-        } elseif (is_numeric($val)) {
+        } elseif (\is_numeric($val)) {
             return (int) $val;
         }
 
@@ -279,11 +279,11 @@ class Environment
     protected function replaceVariables(string $value): string
     {
         foreach ($this->env as $keyEnv => $valueEnv) {
-            $value = str_replace('$' . $keyEnv, $valueEnv, $value);
+            $value = \str_replace('$' . $keyEnv, $valueEnv, $value);
         }
 
-        if (mb_strpos($value, '$') !== false) {
-            throw new EnvironmentException(sprintf('Missing variable in value %s', $value));
+        if (\mb_strpos($value, '$') !== false) {
+            throw new EnvironmentException(\sprintf('Missing variable in value %s', $value));
         }
 
         return $value;
@@ -305,9 +305,9 @@ class Environment
         }
 
         $content = '<?php return ';
-        $content .= var_export($this->env, true);
+        $content .= \var_export($this->env, true);
         $content .= ';';
-        file_put_contents($this->cacheFile, $content);
+        \file_put_contents($this->cacheFile, $content);
     }
 
     /**
@@ -322,7 +322,7 @@ class Environment
     {
         $this->autoload();
 
-        if (!array_key_exists($key, $this->env)) {
+        if (!\array_key_exists($key, $this->env)) {
             return $default;
         }
 
@@ -352,7 +352,7 @@ class Environment
     {
         $this->autoload();
 
-        return array_key_exists($name, $this->env);
+        return \array_key_exists($name, $this->env);
     }
 
     /**
@@ -376,7 +376,7 @@ class Environment
     public function allowedValues(string $name, array $values): bool
     {
         if (!$this->exists($name)) {
-            throw new EnvironmentException(sprintf('Variable %s doesn\'t exist', $name));
+            throw new EnvironmentException(\sprintf('Variable %s doesn\'t exist', $name));
         }
 
         return \in_array($name, $values, true);
