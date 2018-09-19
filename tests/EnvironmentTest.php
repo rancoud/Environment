@@ -29,20 +29,18 @@ class EnvironmentTest extends TestCase
         'CORE' => '/user/www/core',
         'USE_DOLLAR_IN_STRING' => '$HOME'
     ];
-    
+
     protected $fileMultilinesEnvContent = [
-        'RGPD' => "
-i understand
-
-    enough of email fo \"me\"    
-
-thanks
-",
+        'RGPD' => PHP_EOL ."i understand". PHP_EOL .
+            PHP_EOL .
+"    enough of email fo \"me\"    " .PHP_EOL .
+            PHP_EOL .
+"thanks" . PHP_EOL,
         'one' => "one \" two",
         'tow' => "t\"w\"o",
-        'test' => "testA  
-Btest ok   a
-ok"
+        'test' => "testA  " . PHP_EOL .
+"Btest ok   a" . PHP_EOL . 
+"ok"
     ];
 
     protected function getProtectedValue(Environment $env, string $name)
@@ -341,7 +339,6 @@ ok"
         $env->flushCache();
 
         $env->load();
-
 
         static::assertEquals($this->fileMultilinesEnvContent, $env->getAll());
         static::assertSame($this->fileMultilinesEnvContent['RGPD'], $env->get('RGPD'));
