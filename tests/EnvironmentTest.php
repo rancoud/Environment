@@ -369,7 +369,7 @@ ok"
     public function testNoMultilinesEndException()
     {
         static::expectException(EnvironmentException::class);
-        static::expectExceptionMessage('Key a is missing " for multilines');
+        static::expectExceptionMessage('Key a is missing for multilines');
 
         $folders = [__DIR__];
         $fileVariable = 'multilines_not_ending.env';

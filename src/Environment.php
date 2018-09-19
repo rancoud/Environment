@@ -11,28 +11,40 @@ class Environment
 {
     /** @var array */
     protected $env = [];
+
     /** @var array */
     protected $folders = [];
+
     /** @var string */
     protected $currentFolder;
+
     /** @var string */
     protected $filename;
+
     /** @var bool */
     protected $hasLoaded = false;
+
     /** @var int */
     protected $maxtDepth = 5;
+
     /** @var bool */
     protected $useCacheFile = false;
+
     /** @var string */
     protected $cacheFile;
+
     /** @var bool */
     protected $hasToFlush = false;
+
     /** @var bool */
     protected $inMultilines = false;
+
     /** @var string */
     protected $tempText;
+
     /** @var string */
     protected $tempKey;
+
     /** @var string */
     protected $endline = PHP_EOL;
 
@@ -126,7 +138,7 @@ class Environment
      *
      * @throws EnvironmentException
      */
-    protected function parse($content, $depth = 0): void
+    protected function parse(string $content, int $depth = 0): void
     {
         if ($depth > $this->maxtDepth) {
             throw new EnvironmentException('Max recursion env file!');
@@ -143,7 +155,7 @@ class Environment
 
             $this->detectIncludingEnvFile($line, $depth);
 
-            $parts = \mbsplit('=', $line, 2);
+            $parts = \mb_split('=', $line, 2);
             if (\count($parts) === 2) {
                 if ($this->hasQuotes($parts[1])) {
                     $this->tempKey = $parts[0];
@@ -160,16 +172,16 @@ class Environment
         }
 
         if (!empty($this->tempKey)) {
-            throw new EnvironmentException(\sprintf('Key %s is missing " for multilines', $this->tempKey));
+            throw new EnvironmentException(\sprintf('Key %s is missing for multilines', $this->tempKey));
         }
     }
 
     /**
-     * @param $line
+     * @param string $line
      *
      * @return bool
      */
-    protected function isEmptyLine($line): bool
+    protected function isEmptyLine(string $line): bool
     {
         $char = \mb_substr($line, 0, 1);
 
@@ -177,12 +189,12 @@ class Environment
     }
 
     /**
-     * @param $line
-     * @param $depth
+     * @param string $line
+     * @param int    $depth
      *
      * @throws EnvironmentException
      */
-    protected function detectIncludingEnvFile($line, $depth): void
+    protected function detectIncludingEnvFile(string $line, int $depth): void
     {
         if (\mb_substr($line, 0, 1) === '@') {
             $line = \rtrim($line);
@@ -196,11 +208,11 @@ class Environment
     }
 
     /**
-     * @param $line
+     * @param string $line
      *
      * @return bool
      */
-    protected function hasQuotes($line): bool
+    protected function hasQuotes(string $line): bool
     {
         $val = \mb_strtolower($line);
 
@@ -208,9 +220,9 @@ class Environment
     }
 
     /**
-     * @param $line
+     * @param string $line
      */
-    protected function extractText($line): void
+    protected function extractText(string $line): void
     {
         $string = $line;
         if ($this->inMultilines === false) {
@@ -251,7 +263,7 @@ class Environment
      *
      * @return bool|float|int|null|string
      */
-    protected function convertType($value)
+    protected function convertType(string $value)
     {
         $val = \mb_strtolower($value);
         if ($val === 'true') {
@@ -290,10 +302,10 @@ class Environment
     }
 
     /**
-     * @param mixed  $key
+     * @param string $key
      * @param string $value
      */
-    protected function set($key, $value): void
+    protected function set(string $key, $value): void
     {
         $this->env[$key] = $value;
     }
@@ -311,14 +323,14 @@ class Environment
     }
 
     /**
-     * @param      $key
-     * @param null $default
+     * @param string $key
+     * @param null   $default
      *
      * @throws EnvironmentException
      *
      * @return mixed|null
      */
-    public function get($key, $default = null)
+    public function get(string $key, $default = null)
     {
         $this->autoload();
 

@@ -75,19 +75,19 @@ $env->enableCache();
 ## Environment Methods
 ### General Commands  
 * load():void  
-* get(name: string, [default: string = null]):mixed|null  
-* getAll():arrray  
-* exists(name: string):bool  
-* allowedValues(name: string, values: array):bool
+* get(name: string, [default: mixed = null]): mixed|null  
+* getAll(): arrray  
+* exists(name: string): bool  
+* allowedValues(name: string, values: array): bool
 
 ### Cache File  
-* enableCache():void  
-* disableCache():void  
-* flushCache():void  
+* enableCache(): void  
+* disableCache(): void  
+* flushCache(): void  
 
 ### Multilines endline interpretation
 * setEndline(endline: string): void  
-* getEndline():string  
+* getEndline(): string  
 
 ## How to Dev
 `./run_all_commands.sh` for php-cs-fixer and phpunit and coverage  
