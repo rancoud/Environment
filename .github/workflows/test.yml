@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
 
+env:
+  - TRAVIS=true
+
 jobs:
   test:
     runs-on: ${{ matrix.os }}
@@ -38,12 +41,14 @@ jobs:
         if: steps.composer-cache.outputs.cache-hit != 'true'
         run: composer install --prefer-dist --no-progress --no-suggest
 
-      - name: Run test suite
-        shell: bash
+      - name: PHPCS
+        if: ${{ runner.os == 'Windows' }}
         run: |
-          export TRAVIS=true
           vendor/bin/phpcs -s
           vendor/bin/php-cs-fixer fix --diff --dry-run
+
+      - name: PHPUnit
+        run: |
           vendor/bin/phpunit --colors --coverage-text --coverage-clover coverage/clover.xml
 
       - name: Upload coverage
