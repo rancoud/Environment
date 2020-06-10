@@ -6,4 +6,5 @@
   'BOOL_TRUE' => true,
   'BOOL_FALSE' => false,
   'NULL_VALUE' => NULL,
+  'EMPTY_VALUE' => '',
 );
