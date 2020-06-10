@@ -9,44 +9,48 @@ namespace Rancoud\Environment;
  */
 class Environment
 {
-    /** @var array */
-    protected $env = [];
+    public const GETENV = 0x1;
+    public const ENV = 0x2;
+    public const SERVER = 0x4;
 
     /** @var array */
-    protected $folders = [];
+    protected array $env = [];
+
+    /** @var array */
+    protected array $folders = [];
 
     /** @var string */
-    protected $currentFolder;
+    protected string $currentFolder;
 
     /** @var string */
-    protected $filename;
+    protected string $filename;
 
     /** @var bool */
-    protected $hasLoaded = false;
+    protected bool $hasLoaded = false;
 
     /** @var int */
-    protected $maxtDepth = 5;
+    protected int $maxtDepth = 5;
 
     /** @var bool */
-    protected $useCacheFile = false;
+    protected bool $useCacheFile = false;
 
-    /** @var string */
-    protected $cacheFile;
-
-    /** @var bool */
-    protected $hasToFlush = false;
+    /** @var string|null */
+    protected ?string $cacheFile = null;
 
     /** @var bool */
-    protected $inMultilines = false;
+    protected bool $hasToFlush = false;
+
+    /** @var bool */
+    protected bool $inMultilines = false;
 
     /** @var string */
-    protected $tempText;
+    protected string $tempText = '';
 
     /** @var string */
-    protected $tempKey;
+    protected string $tempKey;
 
     /** @var string */
-    protected $endline = PHP_EOL;
+    protected string $endline = PHP_EOL;
 
     /**
      * Environment constructor.
@@ -57,7 +61,7 @@ class Environment
     public function __construct($folders, string $filename = '.env')
     {
         if (!\is_array($folders)) {
-            $folders = [$folders];
+            $folders = [(string) $folders];
         }
 
         $this->folders = $folders;
@@ -157,6 +161,12 @@ class Environment
 
             $parts = \mb_split('=', $line, 2);
             if (\count($parts) === 2) {
+                if (\mb_strtoupper($parts[0]) !== $parts[0]) {
+                    throw new EnvironmentException(\sprintf('Key "%s" must be uppercase', $parts[0]));
+                }
+                if (\is_numeric($parts[0])) {
+                    throw new EnvironmentException(\sprintf('Numeric key "%s" is forbidden', $parts[0]));
+                }
                 if ($this->hasQuotes($parts[1])) {
                     $this->tempKey = $parts[0];
                     $this->extractText($parts[1]);
@@ -172,7 +182,7 @@ class Environment
         }
 
         if (!empty($this->tempKey)) {
-            throw new EnvironmentException(\sprintf('Key %s is missing for multilines', $this->tempKey));
+            throw new EnvironmentException(\sprintf('Key "%s" is missing for multilines', $this->tempKey));
         }
     }
 
@@ -196,7 +206,7 @@ class Environment
      */
     protected function detectIncludingEnvFile(string $line, int $depth): void
     {
-        if (\mb_substr($line, 0, 1) === '@') {
+        if (\mb_strpos($line, '@') === 0) {
             $line = \rtrim($line);
             $filename = \mb_substr($line, 1, \mb_strlen($line));
             $filepath = $this->createFilepath($this->currentFolder, $filename);
@@ -216,7 +226,7 @@ class Environment
     {
         $val = \mb_strtolower($line);
 
-        return \mb_substr($val, 0, 1) === '"';
+        return \mb_strpos($val, '"') === 0;
     }
 
     /**
@@ -261,20 +271,28 @@ class Environment
      *
      * @throws EnvironmentException
      *
-     * @return bool|float|int|null|string
+     * @return bool|float|int|string|null
      */
     protected function convertType(string $value)
     {
         $val = \mb_strtolower($value);
         if ($val === 'true') {
             return true;
-        } elseif ($val === 'false') {
+        }
+
+        if ($val === 'false') {
             return false;
-        } elseif ($val === 'null') {
+        }
+
+        if ($val === 'null') {
             return null;
-        } elseif (\mb_strpos($val, '.') !== false && \is_numeric($val)) {
-            return (float) $val;
-        } elseif (\is_numeric($val)) {
+        }
+
+        if (\is_numeric($val)) {
+            if (\mb_strpos($val, '.') !== false) {
+                return (float) $val;
+            }
+
             return (int) $val;
         }
 
@@ -303,7 +321,7 @@ class Environment
 
     /**
      * @param string $key
-     * @param string $value
+     * @param mixed  $value
      */
     protected function set(string $key, $value): void
     {
@@ -354,17 +372,27 @@ class Environment
     }
 
     /**
-     * @param string $name
+     * @param string|array $keys
      *
      * @throws EnvironmentException
      *
      * @return bool
      */
-    public function exists(string $name): bool
+    public function exists($keys): bool
     {
         $this->autoload();
 
-        return \array_key_exists($name, $this->env);
+        if (!\is_array($keys)) {
+            $keys = [(string) $keys];
+        }
+
+        foreach ($keys as $key) {
+            if (!\array_key_exists($key, $this->env)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -423,5 +451,83 @@ class Environment
     public function getEndline(): string
     {
         return $this->endline;
+    }
+
+    /**
+     * @param $flags
+     *
+     * @throws EnvironmentException
+     */
+    public function complete($flags): void
+    {
+        $this->autoload();
+
+        if ($flags & static::GETENV) {
+            foreach ($this->env as $k => $v) {
+                if ($v === '') {
+                    $value = \getenv($k);
+                    if ($value !== false) {
+                        $value = $this->convertType($value);
+                        $this->set($k, $value);
+                    }
+                }
+            }
+        }
+
+        if ($flags & static::ENV) {
+            foreach ($this->env as $k => $v) {
+                if ($v === '' && isset($_ENV[$k])) {
+                    $value = $this->convertType($_ENV[$k]);
+                    $this->set($k, $value);
+                }
+            }
+        }
+
+        if ($flags & static::SERVER) {
+            foreach ($this->env as $k => $v) {
+                if ($v === '' && isset($_SERVER[$k])) {
+                    $value = $this->convertType($_SERVER[$k]);
+                    $this->set($k, $value);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param $flags
+     *
+     * @throws EnvironmentException
+     */
+    public function override($flags): void
+    {
+        $this->autoload();
+
+        if ($flags & static::GETENV) {
+            foreach ($this->env as $k => $v) {
+                $value = \getenv($k);
+                if ($value !== false) {
+                    $value = $this->convertType($value);
+                    $this->set($k, $value);
+                }
+            }
+        }
+
+        if ($flags & static::ENV) {
+            foreach ($this->env as $k => $v) {
+                if (isset($_ENV[$k])) {
+                    $value = $this->convertType($_ENV[$k]);
+                    $this->set($k, $value);
+                }
+            }
+        }
+
+        if ($flags & static::SERVER) {
+            foreach ($this->env as $k => $v) {
+                if (isset($_SERVER[$k])) {
+                    $value = $this->convertType($_SERVER[$k]);
+                    $this->set($k, $value);
+                }
+            }
+        }
     }
 }

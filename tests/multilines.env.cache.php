@@ -1,6 +1,6 @@
 <?php return array (
-  'one' => 'one " two',
-  'tow' => 't"w"o',
+  'ONE' => 'one " two',
+  'TWO' => 't"w"o',
   'RGPD' => '
 i understand
 
@@ -8,7 +8,7 @@ i understand
 
 thanks
 ',
-  'test' => 'testA  
+  'TEST' => 'testA
 Btest ok   a
 ok',
 );
