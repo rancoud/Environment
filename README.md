@@ -4,8 +4,8 @@
 [![Packagist Version](https://img.shields.io/packagist/v/rancoud/environment)](https://packagist.org/packages/rancoud/environment)
 [![Packagist Downloads](https://img.shields.io/packagist/dt/rancoud/environment)](https://packagist.org/packages/rancoud/environment)
 [![Composer dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)](https://github.com/rancoud/Environment/blob/master/composer.json)
-[![Build Status](https://travis-ci.org/rancoud/Environment.svg?branch=master)](https://travis-ci.org/rancoud/Environment)
-[![Coverage Status](https://coveralls.io/repos/github/rancoud/Environment/badge.svg?branch=master)](https://coveralls.io/github/rancoud/Environment?branch=master)
+[![Test workflow](https://img.shields.io/github/workflow/status/rancoud/environment/test?label=test&logo=github)](https://github.com/rancoud/environment/actions?workflow=test)
+[![Codecov](https://img.shields.io/codecov/c/github/rancoud/environment?logo=codecov)](https://codecov.io/gh/rancoud/environment)
 [![composer.lock](https://poser.pugx.org/rancoud/environment/composerlock)](https://packagist.org/packages/rancoud/environment)
 
 Read Environment file (.env).  
