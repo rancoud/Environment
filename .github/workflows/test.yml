@@ -39,4 +39,15 @@ jobs:
         run: composer install --prefer-dist --no-progress --no-suggest
 
       - name: Run test suite
-        run: TRAVIS=true composer ci
+        run: |
+          TRAVIS=true
+          vendor/bin/phpcs -s
+          vendor/bin/php-cs-fixer fix --diff --dry-run
+          vendor/bin/phpunit --colors --coverage-text --coverage-clover coverage/clover.xml
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1.0.7
+        if: success()
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage/clover.xml
