@@ -53,7 +53,7 @@ thanks
 ## How to use it?
 Warning, call constructor will not load values, you can:  
 * use `load()` function
-* use [any functions](when-load-is-called)  that automatically call `load()` inside  
+* use [any functions](#when-load-is-called)  that automatically call `load()` inside  
 
 ### Simple example
 ```php
