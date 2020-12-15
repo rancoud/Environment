@@ -309,7 +309,7 @@ class Environment
     protected function replaceVariables(string $value): string
     {
         foreach ($this->env as $keyEnv => $valueEnv) {
-            $value = \str_replace('$' . $keyEnv, $valueEnv, $value);
+            $value = \str_replace('$' . $keyEnv, (string) $valueEnv, $value);
         }
 
         if (\mb_strpos($value, '$') !== false) {
