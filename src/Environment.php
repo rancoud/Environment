@@ -50,7 +50,7 @@ class Environment
     protected string $tempKey;
 
     /** @var string */
-    protected string $endline = PHP_EOL;
+    protected string $endline = \PHP_EOL;
 
     /**
      * Environment constructor.
