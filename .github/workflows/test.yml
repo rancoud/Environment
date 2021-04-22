@@ -4,9 +4,6 @@ on:
   push:
   pull_request:
 
-env:
-  TRAVIS: true
-
 jobs:
   test:
     runs-on: ${{ matrix.os }}
@@ -45,7 +42,7 @@ jobs:
           restore-keys: ${{ runner.os }}-${{ matrix.php-version }}-composer-
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-progress --no-suggest
+        run: composer install --prefer-dist --no-progress
 
       - name: Lint
         run: |
@@ -60,5 +57,4 @@ jobs:
         uses: codecov/codecov-action@v1.3.2
         if: success()
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage/clover.xml
