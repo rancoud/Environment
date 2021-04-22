@@ -6,6 +6,8 @@
     <arg value="p"/>
 
     <file>src</file>
+    <file>tests</file>
+    <exclude-pattern>tests/*.cache.php</exclude-pattern>
 
     <rule ref="PSR2"/>
 

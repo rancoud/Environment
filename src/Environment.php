@@ -13,43 +13,30 @@ class Environment
     public const ENV = 0x2;
     public const SERVER = 0x4;
 
-    /** @var array */
     protected array $env = [];
 
-    /** @var array */
     protected array $folders = [];
 
-    /** @var string */
     protected string $currentFolder;
 
-    /** @var string */
     protected string $filename;
 
-    /** @var bool */
     protected bool $hasLoaded = false;
 
-    /** @var int */
     protected int $maxtDepth = 5;
 
-    /** @var bool */
     protected bool $useCacheFile = false;
 
-    /** @var string|null */
     protected ?string $cacheFile = null;
 
-    /** @var bool */
     protected bool $hasToFlush = false;
 
-    /** @var bool */
     protected bool $inMultilines = false;
 
-    /** @var string */
     protected string $tempText = '';
 
-    /** @var string */
     protected string $tempKey;
 
-    /** @var string */
     protected string $endline = \PHP_EOL;
 
     /**
@@ -164,9 +151,11 @@ class Environment
                 if (\mb_strtoupper($parts[0]) !== $parts[0]) {
                     throw new EnvironmentException(\sprintf('Key "%s" must be uppercase', $parts[0]));
                 }
+
                 if (\is_numeric($parts[0])) {
                     throw new EnvironmentException(\sprintf('Numeric key "%s" is forbidden', $parts[0]));
                 }
+
                 if ($this->hasQuotes($parts[1])) {
                     $this->tempKey = $parts[0];
                     $this->extractText($parts[1]);
@@ -342,7 +331,7 @@ class Environment
 
     /**
      * @param string $key
-     * @param null   $default
+     * @param mixed  $default
      *
      * @throws EnvironmentException
      *
@@ -454,11 +443,11 @@ class Environment
     }
 
     /**
-     * @param $flags
+     * @param int $flags
      *
      * @throws EnvironmentException
      */
-    public function complete($flags): void
+    public function complete(int $flags): void
     {
         $this->autoload();
 
@@ -494,11 +483,11 @@ class Environment
     }
 
     /**
-     * @param $flags
+     * @param int $flags
      *
      * @throws EnvironmentException
      */
-    public function override($flags): void
+    public function override(int $flags): void
     {
         $this->autoload();
 
