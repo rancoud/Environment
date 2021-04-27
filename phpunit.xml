@@ -12,5 +12,6 @@
   </testsuites>
   <php>
     <env name="TRAVIS" value="alpha"/>
+    <env name="GITHUB" value="omega"/>
   </php>
 </phpunit>

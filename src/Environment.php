@@ -9,9 +9,13 @@ namespace Rancoud\Environment;
  */
 class Environment
 {
-    public const GETENV = 0x1;
-    public const ENV = 0x2;
-    public const SERVER = 0x4;
+    public const GETENV = 0x01;
+    public const ENV = 0x02;
+    public const SERVER = 0x04;
+
+    public const GETENV_ALL = 0x08;
+    public const ENV_ALL = 0x10;
+    public const SERVER_ALL = 0x20;
 
     protected array $env = [];
 
@@ -480,6 +484,36 @@ class Environment
                 }
             }
         }
+
+        if ($flags & static::GETENV_ALL) {
+            foreach (\getenv() as $k => $v) {
+                if (array_key_exists($k, $this->env) && $this->env[$k] !== '') {
+                    continue;
+                }
+
+                $this->set($k, $v);
+            }
+        }
+
+        if ($flags & static::ENV_ALL) {
+            foreach ($_ENV as $k => $v) {
+                if (array_key_exists($k, $this->env) && $this->env[$k] !== '') {
+                    continue;
+                }
+
+                $this->set($k, $v);
+            }
+        }
+
+        if ($flags & static::SERVER_ALL) {
+            foreach ($_SERVER as $k => $v) {
+                if (array_key_exists($k, $this->env) && $this->env[$k] !== '') {
+                    continue;
+                }
+
+                $this->set($k, $v);
+            }
+        }
     }
 
     /**
@@ -516,6 +550,24 @@ class Environment
                     $value = $this->convertType($_SERVER[$k]);
                     $this->set($k, $value);
                 }
+            }
+        }
+
+        if ($flags & static::GETENV_ALL) {
+            foreach (\getenv() as $k => $v) {
+                $this->set($k, $v);
+            }
+        }
+
+        if ($flags & static::ENV_ALL) {
+            foreach ($_ENV as $k => $v) {
+                $this->set($k, $v);
+            }
+        }
+
+        if ($flags & static::SERVER_ALL) {
+            foreach ($_SERVER as $k => $v) {
+                $this->set($k, $v);
             }
         }
     }

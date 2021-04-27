@@ -75,12 +75,23 @@ $isAllowed = $env->allowedValues('key1', ['value1', NULL, 'value2']);
 ```
 
 ### Complete and Override values
+You have 3 differents flags:
+* Environment::GETENV
+* Environment::ENV
+* Environment::SERVER
+
 Complete is for filling values belong to keys having empty string or no values.  
 Override is for erasing values belong to keys.  
 The treatment given by the flags is always in the same order:
 1. `getenv()`
 2. `$_ENV`
 3. `$_SERVER`
+
+You can also use 3 others flags.  
+Those will inject all keys and values found, your env file is not used for checkings keys.
+* Environment::GETENV_ALL
+* Environment::ENV_ALL
+* Environment::SERVER_ALL
 
 ```php
 $env = new Environment(__DIR__);
@@ -141,14 +152,14 @@ $env = new Environment([__DIR__, '/usr'], 'dev.env');
 ## Environment Constructor
 ### Settings
 #### Mandatory
-| Parameter | Type | Description |
-| --- | --- | --- |
-| folder | string OR array | folder to seek .env file |
+| Parameter | Type            | Description              |
+| --------- | --------------- | ------------------------ |
+| folder    | string OR array | folder to seek .env file |
 
 #### Optionnals
-| Parameter | Type | Default value | Description |
-| --- | --- | --- | --- |
-| filename | string | .env | custom name of .env file (don't forget to add file extension) |
+| Parameter | Type   | Default value | Description                                                   |
+| --------- | ------ | ------------- | ------------------------------------------------------------- |
+| filename  | string | .env          | custom name of .env file (don't forget to add file extension) |
 
 ## Environment Methods
 ### General Commands  
