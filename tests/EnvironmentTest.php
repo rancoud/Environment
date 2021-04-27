@@ -45,6 +45,7 @@ class EnvironmentTest extends TestCase
     ];
 
     protected array $fileCompleteContent = [
+        'GITHUB'       => 'github-action',
         'TRAVIS'       => '',
         'FROM_ENV'     => '',
         'FROM_SERVER'  => '',
@@ -73,6 +74,19 @@ class EnvironmentTest extends TestCase
         $prop->setAccessible(true);
 
         return $prop->getValue($env);
+    }
+
+    public function testBitmasking(): void
+    {
+        $flags = Environment::GETENV | Environment::ENV | Environment::SERVER
+               | Environment::GETENV_ALL | Environment::ENV_ALL | Environment::SERVER_ALL;
+
+        static::assertSame(1, $flags & Environment::GETENV);
+        static::assertSame(2, $flags & Environment::ENV);
+        static::assertSame(4, $flags & Environment::SERVER);
+        static::assertSame(8, $flags & Environment::GETENV_ALL);
+        static::assertSame(16, $flags & Environment::ENV_ALL);
+        static::assertSame(32, $flags & Environment::SERVER_ALL);
     }
 
     /**
@@ -495,6 +509,7 @@ class EnvironmentTest extends TestCase
         $env->load();
 
         static::assertSame($this->fileCompleteContent, $env->getAll());
+        static::assertSame($this->fileCompleteContent['GITHUB'], $env->get('GITHUB'));
         static::assertSame($this->fileCompleteContent['TRAVIS'], $env->get('TRAVIS'));
         static::assertSame($this->fileCompleteContent['FROM_ENV'], $env->get('FROM_ENV'));
         static::assertSame($this->fileCompleteContent['FROM_SERVER'], $env->get('FROM_SERVER'));
@@ -506,6 +521,7 @@ class EnvironmentTest extends TestCase
         static::assertNotSame($this->fileCompleteContent['TRAVIS'], $env->get('TRAVIS'));
         static::assertNotSame($this->fileCompleteContent['FROM_ENV'], $env->get('FROM_ENV'));
         static::assertNotSame($this->fileCompleteContent['FROM_SERVER'], $env->get('FROM_SERVER'));
+        static::assertSame($this->fileCompleteContent['GITHUB'], $env->get('GITHUB'));
         static::assertSame($this->fileCompleteContent['FROM_NOWHERE'], $env->get('FROM_NOWHERE'));
 
         static::assertSame('alpha', $env->get('TRAVIS'));
@@ -569,5 +585,65 @@ class EnvironmentTest extends TestCase
         static::assertSame($this->fileOverrideContent['FROM_ENV'], $env->get('FROM_ENV'));
         static::assertSame($this->fileOverrideContent['FROM_SERVER'], $env->get('FROM_SERVER'));
         static::assertSame($this->fileOverrideContent['FROM_NOWHERE'], $env->get('FROM_NOWHERE'));
+    }
+
+    /**
+     * @throws EnvironmentException
+     */
+    public function testCompleteAll(): void
+    {
+        $_ENV['FROM_ENV'] = 'env_value';
+        $_SERVER['FROM_SERVER'] = 'server_value';
+
+        $env = new Environment(__DIR__, 'complete.env');
+
+        $env->load();
+
+        static::assertSame($this->fileCompleteContent, $env->getAll());
+        static::assertSame($this->fileCompleteContent['GITHUB'], $env->get('GITHUB'));
+        static::assertSame($this->fileCompleteContent['TRAVIS'], $env->get('TRAVIS'));
+        static::assertSame($this->fileCompleteContent['FROM_ENV'], $env->get('FROM_ENV'));
+        static::assertSame($this->fileCompleteContent['FROM_SERVER'], $env->get('FROM_SERVER'));
+        static::assertSame($this->fileCompleteContent['FROM_NOWHERE'], $env->get('FROM_NOWHERE'));
+
+        $env->complete(Environment::GETENV_ALL | Environment::ENV_ALL | Environment::SERVER_ALL);
+
+        static::assertNotSame($this->fileCompleteContent, $env->getAll());
+        static::assertNotSame($this->fileCompleteContent['TRAVIS'], $env->get('TRAVIS'));
+        static::assertNotSame($this->fileCompleteContent['FROM_ENV'], $env->get('FROM_ENV'));
+        static::assertNotSame($this->fileCompleteContent['FROM_SERVER'], $env->get('FROM_SERVER'));
+        static::assertSame($this->fileCompleteContent['GITHUB'], $env->get('GITHUB'));
+        static::assertSame($this->fileCompleteContent['FROM_NOWHERE'], $env->get('FROM_NOWHERE'));
+
+        static::assertSame('alpha', $env->get('TRAVIS'));
+        static::assertSame($_ENV['FROM_ENV'], $env->get('FROM_ENV'));
+        static::assertSame($_SERVER['FROM_SERVER'], $env->get('FROM_SERVER'));
+    }
+
+    /**
+     * @throws EnvironmentException
+     */
+    public function testOverrideAll(): void
+    {
+        $_ENV['FROM_ENV'] = 'env_value';
+        $_SERVER['FROM_SERVER'] = 'server_value';
+
+        $env = new Environment(__DIR__, 'override.env');
+
+        $env->load();
+
+        static::assertSame($this->fileOverrideContent, $env->getAll());
+        static::assertSame($this->fileOverrideContent['TRAVIS'], $env->get('TRAVIS'));
+        static::assertSame($this->fileOverrideContent['FROM_ENV'], $env->get('FROM_ENV'));
+        static::assertSame($this->fileOverrideContent['FROM_SERVER'], $env->get('FROM_SERVER'));
+        static::assertSame($this->fileOverrideContent['FROM_NOWHERE'], $env->get('FROM_NOWHERE'));
+
+        $env->override(Environment::GETENV_ALL | Environment::ENV_ALL | Environment::SERVER_ALL);
+
+        static::assertNotSame([], $env->getAll());
+
+        static::assertSame('alpha', $env->get('TRAVIS'));
+        static::assertSame($_ENV['FROM_ENV'], $env->get('FROM_ENV'));
+        static::assertSame($_SERVER['FROM_SERVER'], $env->get('FROM_SERVER'));
     }
 }
