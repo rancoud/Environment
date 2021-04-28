@@ -646,4 +646,61 @@ class EnvironmentTest extends TestCase
         static::assertSame($_ENV['FROM_ENV'], $env->get('FROM_ENV'));
         static::assertSame($_SERVER['FROM_SERVER'], $env->get('FROM_SERVER'));
     }
+
+    /**
+     * @throws EnvironmentException
+     */
+    public function testOverrideGetEnvAll(): void
+    {
+        $_ENV['FROM_ENV'] = 'env_value';
+        $_SERVER['FROM_SERVER'] = 'server_value';
+
+        $env = new Environment(__DIR__, 'empty.env');
+
+        $env->load();
+
+        $env->override(Environment::GETENV_ALL);
+
+        static::assertSame('alpha', $env->get('TRAVIS', false));
+        static::assertFalse($env->get('FROM_ENV', false));
+        static::assertFalse($env->get('FROM_SERVER', false));
+    }
+
+    /**
+     * @throws EnvironmentException
+     */
+    public function testOverrideEnvAll(): void
+    {
+        $_ENV['FROM_ENV'] = 'env_value';
+        $_SERVER['FROM_SERVER'] = 'server_value';
+
+        $env = new Environment(__DIR__, 'empty.env');
+
+        $env->load();
+
+        $env->override(Environment::ENV_ALL);
+
+        static::assertSame('alpha', $env->get('TRAVIS', false));
+        static::assertSame($_ENV['FROM_ENV'], $env->get('FROM_ENV', false));
+        static::assertFalse($env->get('FROM_SERVER', false));
+    }
+
+    /**
+     * @throws EnvironmentException
+     */
+    public function testOverrideServerAll(): void
+    {
+        $_ENV['FROM_ENV'] = 'env_value';
+        $_SERVER['FROM_SERVER'] = 'server_value';
+
+        $env = new Environment(__DIR__, 'empty.env');
+
+        $env->load();
+
+        $env->override(Environment::SERVER_ALL);
+
+        static::assertFalse($env->get('TRAVIS', false));
+        static::assertFalse($env->get('FROM_ENV', false));
+        static::assertSame($_SERVER['FROM_SERVER'], $env->get('FROM_SERVER', false));
+    }
 }
