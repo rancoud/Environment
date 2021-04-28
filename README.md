@@ -75,6 +75,8 @@ $isAllowed = $env->allowedValues('key1', ['value1', NULL, 'value2']);
 ```
 
 ### Complete and Override values
+Only type conversion will be done on those variables (no replacement with `$`).
+
 You have 3 differents flags:
 * Environment::GETENV
 * Environment::ENV

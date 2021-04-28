@@ -167,6 +167,9 @@ class Environment
                     $parts[1] = \rtrim($parts[1]);
                     $this->inMultilines = false;
                     $parts[1] = $this->convertType($parts[1]);
+                    if (\is_string($parts[1])) {
+                        $parts[1] = $this->replaceVariables($parts[1]);
+                    }
                     $this->set($parts[0], $parts[1]);
                 }
             } elseif ($this->inMultilines) {
@@ -262,8 +265,6 @@ class Environment
     /**
      * @param string $value
      *
-     * @throws EnvironmentException
-     *
      * @return bool|float|int|string|null
      */
     protected function convertType(string $value)
@@ -289,7 +290,7 @@ class Environment
             return (int) $val;
         }
 
-        return $this->replaceVariables($value);
+        return $value;
     }
 
     /**
@@ -460,8 +461,7 @@ class Environment
                 if ($v === '') {
                     $value = \getenv($k);
                     if ($value !== false) {
-                        $value = $this->convertType($value);
-                        $this->set($k, $value);
+                        $this->set($k, $this->convertType($value));
                     }
                 }
             }
@@ -470,7 +470,7 @@ class Environment
         if ($flags & static::ENV) {
             foreach ($this->env as $k => $v) {
                 if ($v === '' && isset($_ENV[$k])) {
-                    $value = $this->convertType($_ENV[$k]);
+                    $value = \is_string($_ENV[$k]) ? $this->convertType($_ENV[$k]): $_ENV[$k];
                     $this->set($k, $value);
                 }
             }
@@ -479,7 +479,7 @@ class Environment
         if ($flags & static::SERVER) {
             foreach ($this->env as $k => $v) {
                 if ($v === '' && isset($_SERVER[$k])) {
-                    $value = $this->convertType($_SERVER[$k]);
+                    $value = \is_string($_SERVER[$k]) ? $this->convertType($_SERVER[$k]): $_SERVER[$k];
                     $this->set($k, $value);
                 }
             }
@@ -491,7 +491,7 @@ class Environment
                     continue;
                 }
 
-                $this->set($k, $v);
+                $this->set($k, $this->convertType($v));
             }
         }
 
@@ -501,6 +501,7 @@ class Environment
                     continue;
                 }
 
+                $v = \is_string($v) ? $this->convertType($v): $v;
                 $this->set($k, $v);
             }
         }
@@ -511,6 +512,7 @@ class Environment
                     continue;
                 }
 
+                $v = \is_string($v) ? $this->convertType($v): $v;
                 $this->set($k, $v);
             }
         }
@@ -529,8 +531,7 @@ class Environment
             foreach ($this->env as $k => $v) {
                 $value = \getenv($k);
                 if ($value !== false) {
-                    $value = $this->convertType($value);
-                    $this->set($k, $value);
+                    $this->set($k, $this->convertType($value));
                 }
             }
         }
@@ -538,7 +539,7 @@ class Environment
         if ($flags & static::ENV) {
             foreach ($this->env as $k => $v) {
                 if (isset($_ENV[$k])) {
-                    $value = $this->convertType($_ENV[$k]);
+                    $value = \is_string($_ENV[$k]) ? $this->convertType($_ENV[$k]): $_ENV[$k];
                     $this->set($k, $value);
                 }
             }
@@ -547,7 +548,7 @@ class Environment
         if ($flags & static::SERVER) {
             foreach ($this->env as $k => $v) {
                 if (isset($_SERVER[$k])) {
-                    $value = $this->convertType($_SERVER[$k]);
+                    $value = \is_string($_SERVER[$k]) ? $this->convertType($_SERVER[$k]): $_SERVER[$k];
                     $this->set($k, $value);
                 }
             }
@@ -555,18 +556,20 @@ class Environment
 
         if ($flags & static::GETENV_ALL) {
             foreach (\getenv() as $k => $v) {
-                $this->set($k, $v);
+                $this->set($k, $this->convertType($v));
             }
         }
 
         if ($flags & static::ENV_ALL) {
             foreach ($_ENV as $k => $v) {
+                $v = \is_string($v) ? $this->convertType($v): $v;
                 $this->set($k, $v);
             }
         }
 
         if ($flags & static::SERVER_ALL) {
             foreach ($_SERVER as $k => $v) {
+                $v = \is_string($v) ? $this->convertType($v): $v;
                 $this->set($k, $v);
             }
         }
