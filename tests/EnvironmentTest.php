@@ -206,7 +206,7 @@ class EnvironmentTest extends TestCase
         $env = new Environment($folders);
 
         static::assertTrue($env->allowedValues('STRING', ['a', 'b', $this->fileEnvContent['STRING']]));
-        static::assertFalse($env->allowedValues('STRING', ['a', 'b', \mb_strtolower($this->fileEnvContent['STRING'])])); //phpcs:ignore
+        static::assertFalse($env->allowedValues('STRING', ['a', 'b', \mb_strtolower($this->fileEnvContent['STRING'])])); // phpcs:ignore
         static::assertFalse($env->allowedValues('STRING', ['a', 'b']));
     }
 
@@ -333,7 +333,7 @@ class EnvironmentTest extends TestCase
         static::assertSame($this->fileEnvContent['EMPTY_VALUE'], $env->get('EMPTY_VALUE'));
 
         static::assertFileExists($filepath);
-        /** @noinspection PhpIncludeInspection */
+
         $data = include $filepath;
         static::assertSame($this->fileEnvContent, $data);
     }
@@ -364,7 +364,7 @@ class EnvironmentTest extends TestCase
         static::assertSame($this->fileEnvContent['EMPTY_VALUE'], $env->get('EMPTY_VALUE'));
 
         static::assertFileExists($filepath);
-        /** @noinspection PhpIncludeInspection */
+
         $data = include $filepath;
         static::assertSame($this->fileEnvContent, $data);
 
@@ -389,6 +389,8 @@ class EnvironmentTest extends TestCase
 
         $env = new Environment($folders, $fileVariable);
         $env->disableCache();
+
+        \unlink($filepath);
 
         $env->load();
 
@@ -437,7 +439,7 @@ class EnvironmentTest extends TestCase
         static::assertSame($this->fileMultilinesEnvContent['TEST'], $env->get('TEST'));
 
         static::assertFileExists($filepath);
-        /** @noinspection PhpIncludeInspection */
+
         $data = include $filepath;
         static::assertSame($this->fileMultilinesEnvContent, $data);
     }
