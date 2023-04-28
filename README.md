@@ -154,12 +154,12 @@ $env = new Environment([__DIR__, '/usr'], 'dev.env');
 ### Settings
 #### Mandatory
 | Parameter | Type            | Description              |
-| --------- | --------------- | ------------------------ |
+|-----------|-----------------|--------------------------|
 | folder    | string OR array | folder to seek .env file |
 
 #### Optionnals
 | Parameter | Type   | Default value | Description                                                   |
-| --------- | ------ | ------------- | ------------------------------------------------------------- |
+|-----------|--------|---------------|---------------------------------------------------------------|
 | filename  | string | .env          | custom name of .env file (don't forget to add file extension) |
 
 ## Environment Methods
