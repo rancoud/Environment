@@ -7,10 +7,11 @@ namespace tests;
 use PHPUnit\Framework\TestCase;
 use Rancoud\Environment\Environment;
 use Rancoud\Environment\EnvironmentException;
-use ReflectionClass;
 
 /**
  * Class EnvironmentTest.
+ *
+ * @internal
  */
 class EnvironmentTest extends TestCase
 {
@@ -59,17 +60,10 @@ class EnvironmentTest extends TestCase
         'FROM_NOWHERE' => 'value04'
     ];
 
-    /**
-     * @param Environment $env
-     * @param string      $name
-     *
-     * @throws \ReflectionException
-     *
-     * @return mixed
-     */
+    /** @throws \ReflectionException */
     protected function getProtectedValue(Environment $env, string $name)
     {
-        $reflexion = new ReflectionClass(Environment::class);
+        $reflexion = new \ReflectionClass(Environment::class);
         $prop = $reflexion->getProperty($name);
         $prop->setAccessible(true);
 
@@ -89,9 +83,7 @@ class EnvironmentTest extends TestCase
         static::assertSame(32, $flags & Environment::SERVER_ALL);
     }
 
-    /**
-     * @throws \ReflectionException
-     */
+    /** @throws \ReflectionException */
     public function testConstruct(): void
     {
         $folders = ['a', 'b'];
@@ -110,9 +102,7 @@ class EnvironmentTest extends TestCase
         static::assertSame('.env', $this->getProtectedValue($env, 'filename'));
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function testLoad(): void
     {
         $folders = [__DIR__];
@@ -143,9 +133,7 @@ class EnvironmentTest extends TestCase
         $env->load();
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function testGetAllAutoload(): void
     {
         $folders = [__DIR__];
@@ -155,9 +143,7 @@ class EnvironmentTest extends TestCase
         static::assertSame($this->fileEnvContent, $env->getAll());
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function testGetAutoload(): void
     {
         $folders = [__DIR__];
@@ -167,9 +153,7 @@ class EnvironmentTest extends TestCase
         static::assertSame($this->fileEnvContent['STRING'], $env->get('STRING'));
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function testGetDefault(): void
     {
         $folders = [__DIR__];
@@ -179,9 +163,7 @@ class EnvironmentTest extends TestCase
         static::assertSame('dev', $env->get('env', 'dev'));
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function testExists(): void
     {
         $folders = [__DIR__];
@@ -196,9 +178,7 @@ class EnvironmentTest extends TestCase
         static::assertFalse($env->exists(['ERROR', 'STRING']));
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function testAllowedValues(): void
     {
         $folders = [__DIR__];
@@ -222,9 +202,7 @@ class EnvironmentTest extends TestCase
         static::assertTrue($env->allowedValues('env', []));
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function testVariablesInEnvFile(): void
     {
         $folders = [__DIR__];
@@ -252,9 +230,7 @@ class EnvironmentTest extends TestCase
         $env->load();
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function testIncludeEnvFile(): void
     {
         $folders = [__DIR__];
@@ -297,9 +273,6 @@ class EnvironmentTest extends TestCase
         $env->load();
     }
 
-    /**
-     * @param string $filepath
-     */
     private function erasePreviousFile(string $filepath): void
     {
         if (\file_exists($filepath)) {
@@ -307,9 +280,7 @@ class EnvironmentTest extends TestCase
         }
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function testUseCacheFile(): void
     {
         $filepath = __DIR__ . \DIRECTORY_SEPARATOR . 'root.env.cache.php';
@@ -338,9 +309,7 @@ class EnvironmentTest extends TestCase
         static::assertSame($this->fileEnvContent, $data);
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function testUseCacheFileAlreadyCreate(): void
     {
         $filepath = __DIR__ . \DIRECTORY_SEPARATOR . 'root.env.cache.php';
@@ -417,9 +386,7 @@ class EnvironmentTest extends TestCase
         static::assertSame($this->fileEnvContent['BOOL_FALSE'], $env->get('BOOL_FALSE'));
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function testMultilines(): void
     {
         $filepath = __DIR__ . \DIRECTORY_SEPARATOR . 'multilines.env.cache.php';
@@ -444,9 +411,7 @@ class EnvironmentTest extends TestCase
         static::assertSame($this->fileMultilinesEnvContent, $data);
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function testGetSetEndline(): void
     {
         $endline = '<br />';
@@ -498,9 +463,7 @@ class EnvironmentTest extends TestCase
         $env->load();
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function testComplete(): void
     {
         $_ENV['FROM_ENV'] = 'env_value';
@@ -531,9 +494,7 @@ class EnvironmentTest extends TestCase
         static::assertSame($_SERVER['FROM_SERVER'], $env->get('FROM_SERVER'));
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function testOverride(): void
     {
         $_ENV['FROM_ENV'] = 'env_value';
@@ -562,9 +523,7 @@ class EnvironmentTest extends TestCase
         static::assertSame($_SERVER['FROM_SERVER'], $env->get('FROM_SERVER'));
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function testCompleteNoEraseValues(): void
     {
         $_ENV['FROM_ENV'] = 'env_value';
@@ -589,9 +548,7 @@ class EnvironmentTest extends TestCase
         static::assertSame($this->fileOverrideContent['FROM_NOWHERE'], $env->get('FROM_NOWHERE'));
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function testCompleteAll(): void
     {
         $_ENV['FROM_ENV'] = 'env_value';
@@ -622,9 +579,7 @@ class EnvironmentTest extends TestCase
         static::assertSame($_SERVER['FROM_SERVER'], $env->get('FROM_SERVER'));
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function testOverrideAll(): void
     {
         $_ENV['FROM_ENV'] = 'env_value';
@@ -649,9 +604,7 @@ class EnvironmentTest extends TestCase
         static::assertSame($_SERVER['FROM_SERVER'], $env->get('FROM_SERVER'));
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function testOverrideGetEnvAll(): void
     {
         $_ENV['FROM_ENV'] = 'env_value';
@@ -668,9 +621,7 @@ class EnvironmentTest extends TestCase
         static::assertFalse($env->get('FROM_SERVER', false));
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function testOverrideEnvAll(): void
     {
         $_ENV['FROM_ENV'] = 'env_value';
@@ -687,9 +638,7 @@ class EnvironmentTest extends TestCase
         static::assertFalse($env->get('FROM_SERVER', false));
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function testOverrideServerAll(): void
     {
         $_ENV['FROM_ENV'] = 'env_value';
