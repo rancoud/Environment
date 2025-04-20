@@ -10,11 +10,15 @@ namespace Rancoud\Environment;
 class Environment
 {
     public const GETENV = 0x01;
+
     public const ENV = 0x02;
+
     public const SERVER = 0x04;
 
     public const GETENV_ALL = 0x08;
+
     public const ENV_ALL = 0x10;
+
     public const SERVER_ALL = 0x20;
 
     protected array $env = [];
@@ -47,7 +51,6 @@ class Environment
      * Environment constructor.
      *
      * @param array|string $folders
-     * @param string       $filename
      */
     public function __construct($folders, string $filename = '.env')
     {
@@ -59,9 +62,7 @@ class Environment
         $this->filename = $filename;
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function load(): void
     {
         $filepath = $this->findFileInFolders();
@@ -83,11 +84,7 @@ class Environment
     }
 
     /**
-     * @param int $currentIdx
-     *
      * @throws EnvironmentException
-     *
-     * @return string
      */
     protected function findFileInFolders(int $currentIdx = 0): string
     {
@@ -111,12 +108,6 @@ class Environment
         return $filepath;
     }
 
-    /**
-     * @param string $folder
-     * @param string $filename
-     *
-     * @return string
-     */
     protected function createFilepath(string $folder, string $filename): string
     {
         $separator = '';
@@ -128,9 +119,6 @@ class Environment
     }
 
     /**
-     * @param string $content
-     * @param int    $depth
-     *
      * @throws EnvironmentException
      */
     protected function parse(string $content, int $depth = 0): void
@@ -142,7 +130,7 @@ class Environment
         $lines = \mb_split("\n", $content);
         foreach ($lines as $line) {
             if ($this->inMultilines === false) {
-                $line = \ltrim($line);
+                $line = \mb_ltrim($line);
                 if ($this->isEmptyLine($line)) {
                     continue;
                 }
@@ -164,7 +152,7 @@ class Environment
                     $this->tempKey = $parts[0];
                     $this->extractText($parts[1]);
                 } else {
-                    $parts[1] = \rtrim($parts[1]);
+                    $parts[1] = \mb_rtrim($parts[1]);
                     $this->inMultilines = false;
                     $parts[1] = $this->convertType($parts[1]);
                     if (\is_string($parts[1])) {
@@ -182,11 +170,6 @@ class Environment
         }
     }
 
-    /**
-     * @param string $line
-     *
-     * @return bool
-     */
     protected function isEmptyLine(string $line): bool
     {
         $char = \mb_substr($line, 0, 1);
@@ -195,15 +178,12 @@ class Environment
     }
 
     /**
-     * @param string $line
-     * @param int    $depth
-     *
      * @throws EnvironmentException
      */
     protected function detectIncludingEnvFile(string $line, int $depth): void
     {
         if (\mb_strpos($line, '@') === 0) {
-            $line = \rtrim($line);
+            $line = \mb_rtrim($line);
             $filename = \mb_substr($line, 1, \mb_strlen($line));
             $filepath = $this->createFilepath($this->currentFolder, $filename);
             if (!\file_exists($filepath)) {
@@ -213,11 +193,6 @@ class Environment
         }
     }
 
-    /**
-     * @param string $line
-     *
-     * @return bool
-     */
     protected function hasQuotes(string $line): bool
     {
         $val = \mb_strtolower($line);
@@ -225,9 +200,6 @@ class Environment
         return \mb_strpos($val, '"') === 0;
     }
 
-    /**
-     * @param string $line
-     */
     protected function extractText(string $line): void
     {
         $string = $line;
@@ -241,7 +213,7 @@ class Environment
         do {
             $lastPosition = \mb_strpos($string, '"', $lastPosition);
             if ($lastPosition === false) {
-                $this->tempText .= \rtrim($string, "\r\n") . $this->endline;
+                $this->tempText .= \mb_rtrim($string, "\r\n") . $this->endline;
                 $endLine = true;
             } elseif (\mb_substr($string, $lastPosition - 1, 1) !== '\\') {
                 $this->tempText .= \mb_substr($string, 0, $lastPosition);
@@ -263,8 +235,6 @@ class Environment
     }
 
     /**
-     * @param string $value
-     *
      * @return bool|float|int|string|null
      */
     protected function convertType(string $value)
@@ -279,7 +249,7 @@ class Environment
         }
 
         if ($val === 'null') {
-            return null;
+            return;
         }
 
         if (\is_numeric($val)) {
@@ -294,11 +264,7 @@ class Environment
     }
 
     /**
-     * @param string $value
-     *
      * @throws EnvironmentException
-     *
-     * @return string
      */
     protected function replaceVariables(string $value): string
     {
@@ -313,10 +279,6 @@ class Environment
         return $value;
     }
 
-    /**
-     * @param string $key
-     * @param mixed  $value
-     */
     protected function set(string $key, $value): void
     {
         $this->env[$key] = $value;
@@ -335,9 +297,6 @@ class Environment
     }
 
     /**
-     * @param string $key
-     * @param mixed  $default
-     *
      * @throws EnvironmentException
      *
      * @return mixed|null
@@ -355,8 +314,6 @@ class Environment
 
     /**
      * @throws EnvironmentException
-     *
-     * @return array
      */
     public function getAll(): array
     {
@@ -366,11 +323,9 @@ class Environment
     }
 
     /**
-     * @param string|array $keys
+     * @param array|string $keys
      *
      * @throws EnvironmentException
-     *
-     * @return bool
      */
     public function exists($keys): bool
     {
@@ -389,9 +344,7 @@ class Environment
         return true;
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     protected function autoload(): void
     {
         if (!$this->hasLoaded) {
@@ -400,12 +353,7 @@ class Environment
     }
 
     /**
-     * @param string $name
-     * @param array  $values
-     *
      * @throws EnvironmentException
-     *
-     * @return bool
      */
     public function allowedValues(string $name, array $values): bool
     {
@@ -431,25 +379,17 @@ class Environment
         $this->hasToFlush = true;
     }
 
-    /**
-     * @param string $endline
-     */
     public function setEndline(string $endline): void
     {
         $this->endline = $endline;
     }
 
-    /**
-     * @return string
-     */
     public function getEndline(): string
     {
         return $this->endline;
     }
 
     /**
-     * @param int $flags
-     *
      * @throws EnvironmentException
      */
     public function complete(int $flags): void
@@ -521,8 +461,6 @@ class Environment
     }
 
     /**
-     * @param int $flags
-     *
      * @throws EnvironmentException
      */
     public function override(int $flags): void
