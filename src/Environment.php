@@ -83,9 +83,7 @@ class Environment
         $this->hasLoaded = true;
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     protected function findFileInFolders(int $currentIdx = 0): string
     {
         if ($currentIdx >= \count($this->folders)) {
@@ -118,9 +116,7 @@ class Environment
         return $folder . $separator . $filename;
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     protected function parse(string $content, int $depth = 0): void
     {
         if ($depth > $this->maxtDepth) {
@@ -177,9 +173,7 @@ class Environment
         return empty($line) || $char === '#' || $char === ';';
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     protected function detectIncludingEnvFile(string $line, int $depth): void
     {
         if (\mb_strpos($line, '@') === 0) {
@@ -234,9 +228,7 @@ class Environment
         }
     }
 
-    /**
-     * @return bool|float|int|string|null
-     */
+    /** @return bool|float|int|string|null */
     protected function convertType(string $value)
     {
         $val = \mb_strtolower($value);
@@ -263,9 +255,7 @@ class Environment
         return $value;
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     protected function replaceVariables(string $value): string
     {
         foreach ($this->env as $keyEnv => $valueEnv) {
@@ -297,8 +287,8 @@ class Environment
     }
 
     /**
+     * @param  mixed|null           $default
      * @throws EnvironmentException
-     *
      * @return mixed|null
      */
     public function get(string $key, $default = null)
@@ -312,9 +302,7 @@ class Environment
         return $this->env[$key];
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function getAll(): array
     {
         $this->autoload();
@@ -352,9 +340,7 @@ class Environment
         }
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function allowedValues(string $name, array $values): bool
     {
         if (!$this->exists($name)) {
@@ -389,9 +375,7 @@ class Environment
         return $this->endline;
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function complete(int $flags): void
     {
         $this->autoload();
@@ -460,9 +444,7 @@ class Environment
         }
     }
 
-    /**
-     * @throws EnvironmentException
-     */
+    /** @throws EnvironmentException */
     public function override(int $flags): void
     {
         $this->autoload();

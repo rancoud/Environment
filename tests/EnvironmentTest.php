@@ -60,9 +60,7 @@ class EnvironmentTest extends TestCase
         'FROM_NOWHERE' => 'value04'
     ];
 
-    /**
-     * @throws \ReflectionException
-     */
+    /** @throws \ReflectionException */
     protected function getProtectedValue(Environment $env, string $name)
     {
         $reflexion = new \ReflectionClass(Environment::class);
