@@ -9,17 +9,17 @@ namespace Rancoud\Environment;
  */
 class Environment
 {
-    public const GETENV = 0x01;
+    public const int GETENV = 0x01;
 
-    public const ENV = 0x02;
+    public const int ENV = 0x02;
 
-    public const SERVER = 0x04;
+    public const int SERVER = 0x04;
 
-    public const GETENV_ALL = 0x08;
+    public const int GETENV_ALL = 0x08;
 
-    public const ENV_ALL = 0x10;
+    public const int ENV_ALL = 0x10;
 
-    public const SERVER_ALL = 0x20;
+    public const int SERVER_ALL = 0x20;
 
     protected array $env = [];
 
@@ -229,7 +229,7 @@ class Environment
     }
 
     /** @return bool|float|int|string|null */
-    protected function convertType(string $value)
+    protected function convertType(string $value): mixed
     {
         $val = \mb_strtolower($value);
         if ($val === 'true') {
@@ -241,7 +241,7 @@ class Environment
         }
 
         if ($val === 'null') {
-            return;
+            return null;
         }
 
         if (\is_numeric($val)) {
