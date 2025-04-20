@@ -8,11 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Rancoud\Environment\Environment;
 use Rancoud\Environment\EnvironmentException;
 
-/**
- * Class EnvironmentTest.
- *
- * @internal
- */
+/** @internal */
 class EnvironmentTest extends TestCase
 {
     protected array $fileEnvContent = [
@@ -64,10 +60,8 @@ class EnvironmentTest extends TestCase
     protected function getProtectedValue(Environment $env, string $name)
     {
         $reflexion = new \ReflectionClass(Environment::class);
-        $prop = $reflexion->getProperty($name);
-        $prop->setAccessible(true);
 
-        return $prop->getValue($env);
+        return $reflexion->getProperty($name)->getValue($env);
     }
 
     public function testBitmasking(): void

@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Rancoud\Environment;
 
-/**
- * Class Environment.
- */
 class Environment
 {
     public const int GETENV = 0x01;
@@ -47,15 +44,10 @@ class Environment
 
     protected string $endline = \PHP_EOL;
 
-    /**
-     * Environment constructor.
-     *
-     * @param array|string $folders
-     */
-    public function __construct($folders, string $filename = '.env')
+    public function __construct(array|string $folders, string $filename = '.env')
     {
         if (!\is_array($folders)) {
-            $folders = [(string) $folders];
+            $folders = [$folders];
         }
 
         $this->folders = $folders;
@@ -228,8 +220,7 @@ class Environment
         }
     }
 
-    /** @return bool|float|int|string|null */
-    protected function convertType(string $value): mixed
+    protected function convertType(string $value): bool|float|int|string|null
     {
         $val = \mb_strtolower($value);
         if ($val === 'true') {
@@ -269,7 +260,7 @@ class Environment
         return $value;
     }
 
-    protected function set(string $key, $value): void
+    protected function set(string $key, mixed $value): void
     {
         $this->env[$key] = $value;
     }
@@ -287,11 +278,10 @@ class Environment
     }
 
     /**
-     * @param  mixed|null           $default
      * @throws EnvironmentException
      * @return mixed|null
      */
-    public function get(string $key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         $this->autoload();
 
@@ -310,17 +300,13 @@ class Environment
         return $this->env;
     }
 
-    /**
-     * @param array|string $keys
-     *
-     * @throws EnvironmentException
-     */
-    public function exists($keys): bool
+    /** @throws EnvironmentException */
+    public function exists(array|string $keys): bool
     {
         $this->autoload();
 
         if (!\is_array($keys)) {
-            $keys = [(string) $keys];
+            $keys = [$keys];
         }
 
         foreach ($keys as $key) {
