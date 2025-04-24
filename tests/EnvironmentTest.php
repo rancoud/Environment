@@ -180,7 +180,7 @@ class EnvironmentTest extends TestCase
         $env = new Environment($folders);
 
         static::assertTrue($env->allowedValues('STRING', ['a', 'b', $this->fileEnvContent['STRING']]));
-        static::assertFalse($env->allowedValues('STRING', ['a', 'b', \mb_strtolower($this->fileEnvContent['STRING'])])); // phpcs:ignore
+        static::assertFalse($env->allowedValues('STRING', ['a', 'b', \mb_strtolower($this->fileEnvContent['STRING'])]));
         static::assertFalse($env->allowedValues('STRING', ['a', 'b']));
     }
 
