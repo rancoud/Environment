@@ -8,7 +8,9 @@ use PHPUnit\Framework\TestCase;
 use Rancoud\Environment\Environment;
 use Rancoud\Environment\EnvironmentException;
 
-/** @internal */
+/**
+ * @internal
+ */
 class EnvironmentTest extends TestCase
 {
     protected array $fileEnvContent = [
