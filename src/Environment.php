@@ -115,7 +115,7 @@ class Environment
             throw new EnvironmentException('Max recursion env file!');
         }
 
-        $lines = \mb_split("\n", $content);
+        $lines = \explode("\n", $content);
         foreach ($lines as $line) {
             if ($this->inMultilines === false) {
                 $line = \mb_ltrim($line);
@@ -126,7 +126,7 @@ class Environment
 
             $this->detectIncludingEnvFile($line, $depth);
 
-            $parts = \mb_split('=', $line, 2);
+            $parts = \explode('=', $line, 2);
             if (\count($parts) === 2) {
                 if (\mb_strtoupper($parts[0]) !== $parts[0]) {
                     throw new EnvironmentException(\sprintf('Key "%s" must be uppercase', $parts[0]));
